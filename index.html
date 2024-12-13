@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Dad!</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            font-family: Arial, sans-serif;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #countdown {
+            font-size: 3rem;
+            margin: 20px;
+            text-align: center;
+        }
+
+        #birthday-content {
+            display: none;
+            text-align: center;
+        }
+
+        #birthday-message {
+            opacity: 0;
+            font-size: 3rem;
+        }
+
+        /* Enhanced fireworks styles */
+        .firework {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: firework 1.5s ease-out forwards;
+        }
+
+        @keyframes firework {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x), var(--y)) scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        /* Fade-in and fade-out animations */
+        .fade-in {
+            animation: fadeIn 2s forwards;
+        }
+
+        .fade-out {
+            animation: fadeOut 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+            }
+        }
+
+        #video-container {
+            display: none;
+            margin-top: 20px;
+            max-width: 1200px;
+            width: 95vw;
+            height: 80vh;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            aspect-ratio: 16/9;
+            border: none;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="countdown">
+        <h2>Birthday Countdown</h2>
+        <div id="timer"></div>
+    </div>
+
+    <div id="birthday-content">
+        <h1 id="birthday-message">🎉 Happy 50th Birthday Dad! 🎉</h1>
+        <div id="video-container">
+            <iframe 
+                src="https://www.youtube.com/embed/22Z8AR8ntwM?autoplay=1&mute=0&vq=hd720" 
+                allow="autoplay; fullscreen" 
+                allowfullscreen 
+                style="border: none;">
+            </iframe>
+        </div>
+    </div>
+
+    <script>
+        function createFirework() {
+            const numParticles = 30; // Increase for more particles
+            const angleIncrement = (Math.PI * 2) / numParticles;
+            const centerX = Math.random() * window.innerWidth;
+            const centerY = Math.random() * window.innerHeight;
+
+            for (let i = 0; i < numParticles; i++) {
+                const firework = document.createElement('div');
+                firework.className = 'firework';
+                
+                const angle = i * angleIncrement;
+                const speed = Math.random() * 300 + 200;
+
+                const x = Math.cos(angle) * speed;
+                const y = Math.sin(angle) * speed;
+
+                firework.style.setProperty('--x', `${x}px`);
+                firework.style.setProperty('--y', `${y}px`);
+                firework.style.left = `${centerX}px`;
+                firework.style.top = `${centerY}px`;
+                firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                
+                document.body.appendChild(firework);
+                
+                setTimeout(() => {
+                    firework.remove();
+                }, 1500);
+            }
+        }
+
+        // Set the target date (10 seconds from now)
+        const targetTime = new Date(Date.now() + 10 * 1000);
+
+        function updateCountdown() {
+            const now = new Date();
+            const diff = targetTime - now;
+
+            if (diff <= 0) {
+                document.getElementById('countdown').style.display = 'none';
+                document.getElementById('birthday-content').style.display = 'block';
+
+                // Start the birthday message sequence
+                showBirthdayMessage();
+            } else {
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('timer').innerHTML = 
+                    `${hours}h ${minutes}m ${seconds}s`;
+            }
+        }
+
+        function showBirthdayMessage() {
+            const message = document.getElementById('birthday-message');
+            message.classList.add('fade-in');
+
+            // Start fireworks during message display
+            const fireworkInterval = setInterval(createFirework, 300);
+
+            // After fade-in completes (2s), wait 1s, then fade out
+            setTimeout(() => {
+                message.classList.remove('fade-in');
+                message.classList.add('fade-out');
+            }, 3000); // 2s fade in + 1s delay
+
+            // After fade-out completes (1s), hide message and show video
+            setTimeout(() => {
+                message.style.display = 'none';
+                const videoContainer = document.getElementById('video-container');
+                videoContainer.style.display = 'block';
+                clearInterval(fireworkInterval); // Stop fireworks when video starts
+            }, 4000); // Total 4s
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+</body>
+</html>
